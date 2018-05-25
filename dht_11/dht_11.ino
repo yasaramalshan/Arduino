@@ -1,3 +1,10 @@
+/**
+ * @author Yasara JLP
+ * Humidity Sensor
+ * 
+ */
+
+
 #include "dht.h"
 #define dht_apin A0
 

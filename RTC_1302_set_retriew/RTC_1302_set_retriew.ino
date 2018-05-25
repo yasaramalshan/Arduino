@@ -1,19 +1,15 @@
-// Example sketch for interfacing with the DS1302 timekeeping chip.
-//
-// Copyright (c) 2009, Matt Sparks
-// All rights reserved.
-//
-// http://quadpoint.org/projects/arduino-ds1302
+/**
+ * @author Yasara JLP
+ * Real Time Clock
+ * Set The Correct Time & Get The Readings
+ * 
+ */
+ 
 #include <stdio.h>
 #include <DS1302.h>
 
 namespace {
 
-// Set the appropriate digital I/O pin connections. These are the pin
-// assignments for the Arduino as well for as the DS1302 chip. See the DS1302
-// datasheet:
-//
-//   http://datasheets.maximintegrated.com/en/ds/DS1302.pdf
 const int kCePin   = 8;  // Chip Enable
 const int kIoPin   = 7;  // Input/Output
 const int kSclkPin = 6;  // Serial Clock

@@ -1,3 +1,8 @@
+/**
+ * @author Yasara JLP
+ * Color Recognition Sensor
+ */
+ 
 int s0 = 4;
 int s1 = 5;
 int s2 = 6;

@@ -1,3 +1,7 @@
+/**
+ * @author Yasara JLP
+ * 
+ */
 #include <LiquidCrystal.h>
 #include <FreqCount.h>
 

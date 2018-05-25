@@ -1,4 +1,9 @@
-// include the library code:
+/**
+ * @author Yasara JLP
+ * LCD Display
+ * 
+ */
+ 
 #include <LiquidCrystal.h>
 
 // initialize the library by associating any needed LCD interface pin

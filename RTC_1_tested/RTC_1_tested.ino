@@ -1,3 +1,10 @@
+/**
+ * @author Yasara JLP
+ * Real Time Clock
+ * Set The Correct Time & Get The Readings
+ * 
+ */
+
 #include <virtuabotixRTC.h> //Library used
 
 

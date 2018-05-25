@@ -1,4 +1,8 @@
-
+/**
+ * @author Yasara JLP
+ * Soil Moisture Sensor
+ * 
+ */
 
 int sensorPin = A0;  
 int sensorValue = 0;  

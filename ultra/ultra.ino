@@ -1,3 +1,9 @@
+/**
+ * @author Yasara JLP
+ * Ultrasonic Sensor
+ * 
+ */
+ 
 #define trig 2
 #define echo 4
 

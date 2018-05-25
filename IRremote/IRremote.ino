@@ -1,3 +1,9 @@
+/**
+ * @author Yasara JLP
+ * IR Remote
+ * 
+ */
+ 
 #include <IRremote.h>
 
 int receiver = 11;

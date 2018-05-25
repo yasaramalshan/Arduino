@@ -1,8 +1,8 @@
-// Distributed with a free-will license.
-// Use it any way you want, profit or free, provided it fits in the licenses of its associated works.
-// MAG3110
-// This code is designed to work with the MAG3110_I2CS I2C Mini Module available from ControlEverything.com.
-// https://www.controleverything.com/content/Compass?sku=MAG3110_I2CS#tabs-0-product_tabset-2
+/**
+ * @author Yasara JLP
+ * MAG3110 magnetometer - I2C
+ * 
+ */
 
 
 #include<Wire.h>

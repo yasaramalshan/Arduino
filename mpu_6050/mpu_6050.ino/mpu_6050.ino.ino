@@ -1,4 +1,3 @@
-
 #include <Wire.h>
 
 long accelX, accelY, accelZ;
@@ -18,7 +17,7 @@ void loop() {
   recordAccelRegisters();
   recordGyroRegisters();
   printData();
-  delay(1000);
+  delay(100);
 }
 
 void setupMPU(){

@@ -1,3 +1,9 @@
+/**
+ * @author Yasara JLP
+ * MAG3110 magnetometer - I2C
+ * 
+ */
+ 
 #include <Wire.h>
  
 #define MAG_ADDR  0x0E //7-bit address for the MAG3110, doesn't change

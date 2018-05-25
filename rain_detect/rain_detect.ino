@@ -1,3 +1,9 @@
+/**
+ * @author Yasara JLP
+ * RainDrops Sensor
+ * 
+ */
+
 //Attach sensor's Analoig Out (AO) pin to A0 pin of the Arduino
 #define rainDropsPin A0
 void setup() {

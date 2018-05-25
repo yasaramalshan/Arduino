@@ -1,21 +1,20 @@
-// Arduino code is available to download - link below the video.
+/**
+ * @author Yasara JLP
+ * Color Recognition Sensor - TCS230
+ * 
+ * Color Sensor      Arduino
+ * -----------      --------
+ * VCC               5V
+ * GND               GND
+ * s0                8
+ * s1                9
+ * s2                12
+ * s3                11
+ * OUT               10
+ * OE                GND
+ * 
+ */
 
-
-/*
-// TCS230 color recognition sensor 
-// Sensor connection pins to Arduino are shown in comments
-
-Color Sensor      Arduino
------------      --------
- VCC               5V
- GND               GND
- s0                8
- s1                9
- s2                12
- s3                11
- OUT               10
- OE                GND
-*/
 const int s0 = 8;  
 const int s1 = 9;  
 const int s2 = 12;  

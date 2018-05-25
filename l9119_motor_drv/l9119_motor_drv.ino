@@ -1,6 +1,7 @@
-/*
- http://www.bajdi.com
- L9110 motor driver controlling 2 small DC motors 
+/**
+ * @author Yasara JLP
+ * L9110 Motor Driver
+ * 
  */
 
 const int AIA = 9;  // (pwm) pin 9 connected to pin A-IA 
