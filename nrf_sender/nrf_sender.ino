@@ -20,7 +20,7 @@ void setup() {
 }
 
 void loop() {
-  const char text[] = "data sent....!";
+  const char text[] = "1";
   radio.write(&text, sizeof(text));
   Serial.println("sent");
   delay(1000);
