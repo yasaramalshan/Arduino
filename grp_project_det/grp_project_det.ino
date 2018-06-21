@@ -9,6 +9,8 @@
 
 // for GSM
 #include <SoftwareSerial.h>
+//for magnetometer
+#include<Wire.h>
 
 #define soilSensor A0
 
@@ -20,9 +22,26 @@ RF24 radio(7, 8); // CE, CSN   // object for NRF
 char incoming_message;
 String generatedString = "";
 String receivedMsg = "";
+String sender;
 
 // for the NRF
 const byte address[6] = "00001";
+
+// for magnetometer
+#define Addr 0x0E
+int prevX , prevY , prevZ , curX, curY, curZ;
+bool needInitialize;
+
+// for soil
+int soilRead;
+
+
+// for data
+String recipient = "+94769948165";
+
+unsigned long startMillis,currentMillis;
+const unsigned long period = 300;
+
 
 void setup() {
   Serial.begin(19200);
@@ -33,58 +52,141 @@ void setup() {
   configGSM_sms(); // set AT commands related to SMS Receive.
 
   // --------------------- NRF --------------------- //
-  radio.begin();
-  radio.openWritingPipe(address);
-  radio.setPALevel(RF24_PA_MIN);
-  radio.stopListening();
+  setupNRF();
+
+  // --------------------- Mag --------------------- //
+  setupMagneto();
+
+  delay(300);
+  startMillis = millis();
 }
 
 
 int x = 3;
 void loop() {
-  //char text[] = "data sent....!";
-  //radio.write(&text, sizeof(text));// transmit nrf message
-  //Serial.println("sent");
-  //Serial.print("Soil Sensor Reading : ");
-  //Serial.println(soilMoistureSensor(soilSensor));
-  //delay(1000);
+
+  // -------------------------------------------------------------------------------- //
   getAvailableMessage_GSM(); // listening to sms receiver
 
-  if (receivedMsg.length() > 0) { // after received a message
+  if (receivedMsg.length() > 0 && sender.equals(recipient)) { // after received a message
+    //Serial.println("cxcx");
     if (receivedMsg.equals("0")) {
       char text[] = "0";
-      for(int i = 0;i<2;i++){
+      for (int i = 0; i < 2; i++) {
         radio.write(&text, sizeof(text));
         delay(100);
-        }
+      }
     } else if (receivedMsg.equals("1")) {
       char text[] = "2";
-      for(int i = 0;i<2;i++){
+      for (int i = 0; i < 2; i++) {
         radio.write(&text, sizeof(text));
         delay(100);
-        }
+      }
     }
 
     Serial.println("message -> " + receivedMsg);
   }
 
-  if (x == 5) {
-    sendMessage("776721484", "asd5asd"); x = 2;
+  // -------------------------------------------------------------------------------- //
+  readMagnato();
+
+  soilRead = soilMoistureSensor(soilSensor);
+
+  if (abs(prevX - curX) > 6000 || abs(prevY - curY) > 6000 || abs(prevZ - curZ) > 6000) {
+    Serial.println("primary");
+    String dataSet = String(curX) + "," + String(curY) + "," + String(curZ) + "," + String(soilRead);
+    //sendMessage(recipient, "data");
+    Serial.println("emergency send : " + dataSet);
+    char text[] = "1";
+    for (int i = 0; i < 2; i++) {
+      radio.write(&text, sizeof(text));
+      delay(100);
+    }
+    delay(200);
+    startMillis = currentMillis;
+
+  } else {
+    currentMillis = millis();
+    if (currentMillis - startMillis >= 7000) {
+      String dataSet = String(curX) + "," + String(curY) + "," + String(curZ) + "," + String(soilRead);
+      //sendMessage(recipient, "data");
+      delay(200);
+      Serial.println("normal send : " + dataSet);
+      startMillis = currentMillis;
+    }
+
+    
+
   }
+
+  prevX = curX;
+  prevY = curY;
+  prevZ = curZ;
+
+
+
 }
 
 
 // for get the current value of soilSensor
 int soilMoistureSensor(uint8_t pin) {
   int soilMoistureSensorValue = analogRead(pin);
-  Serial.println(soilMoistureSensorValue);
-  delay(100);
+  //Serial.println(soilMoistureSensorValue);
   return soilMoistureSensorValue;
 
 }
 
 
+void setupNRF() {
+  radio.begin();
+  radio.openWritingPipe(address);
+  radio.setPALevel(RF24_PA_MIN);
+  radio.stopListening();
 
+}
+
+
+void setupMagneto() {
+  needInitialize  = true; // to set prev variables
+  Wire.begin();// Initialise I2C communication as MASTER
+  Wire.beginTransmission(Addr);// Start I2C Transmission
+  Wire.write(0x10);// Select control register-1
+  Wire.write(0x01);// Set active mode enabled
+  Wire.endTransmission();// Stop I2C Transmission
+  readMagnato(); // set prev X,Y,Z values
+}
+
+void readMagnato() {
+  unsigned int data[6];
+  Wire.beginTransmission(Addr); // Start I2C Transmission
+  Wire.write(0x01); // Select data register
+  Wire.endTransmission(); // Stop I2C Transmission
+  Wire.requestFrom(Addr, 6); // Request 6 bytes of data
+
+  // Read 6 bytes of data
+  // xMag lsb, xMag msb, yMag lsb, y Mag msb, zMag lsb, zMag msb
+  if (Wire.available() == 6) {
+    data[0] = Wire.read();
+    data[1] = Wire.read();
+    data[2] = Wire.read();
+    data[3] = Wire.read();
+    data[4] = Wire.read();
+    data[5] = Wire.read();
+  }
+
+  if (needInitialize) {
+    prevX = ((data[1] * 256) + data[0]);
+    prevY = ((data[3] * 256) + data[2]);
+    prevZ = ((data[5] * 256) + data[4]);
+    needInitialize = false;
+  } else {
+    curX = ((data[1] * 256) + data[0]);
+    curY = ((data[3] * 256) + data[2]);
+    curZ = ((data[5] * 256) + data[4]);
+  }
+
+  delay(50);
+}
 // to set the GSM device's state to sms mode & clear all stored sms' in the sim card
 void configGSM_sms() {
   SIM900.print("AT+CMGF=1\r");  // set SMS mode to text
@@ -104,11 +206,12 @@ void getAvailableMessage_GSM() {
   } else {
     if (generatedString.length() > 50) {
       generatedString.trim();
-      receivedMsg = generatedString.substring(48);
+      sender = generatedString.substring(7, 19); // get the number who sends the message
+      receivedMsg = generatedString.substring(48); // get the message
     } else {
       receivedMsg = "";
     }
-    delay(500);
+    //delay(500);
     generatedString = "";
   }
 }

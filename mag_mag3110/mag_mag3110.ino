@@ -16,9 +16,9 @@ void setup()
 }
  
 void loop()
-{ Serial.println("xxxxxxxxxxxx");
+{ 
   print_values();
-  delay(5);
+  delay(100);
 }
  
 void config(void)
