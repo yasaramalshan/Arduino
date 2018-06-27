@@ -1,6 +1,6 @@
 /**
    @author Yasara JLP
-   NRF Sender
+   Group Project
 */
 
 #include <SPI.h>
@@ -23,12 +23,13 @@ char incoming_message;
 String generatedString = "";
 String receivedMsg = "";
 String sender;
+int timeout;
 
 // for the NRF
 const byte address[6] = "00001";
 
 // for magnetometer
-#define Addr 0x0E
+#define Addr 0x1E
 int prevX , prevY , prevZ , curX, curY, curZ;
 bool needInitialize;
 
@@ -37,9 +38,9 @@ int soilRead;
 
 
 // for data
-String recipient = "+94769948165";
+String recipient = "+94729143275";
 
-unsigned long startMillis,currentMillis;
+unsigned long startMillis, currentMillis;
 const unsigned long period = 300;
 
 
@@ -57,29 +58,29 @@ void setup() {
   // --------------------- Mag --------------------- //
   setupMagneto();
 
-  delay(300);
   startMillis = millis();
 }
 
 
-int x = 3;
 void loop() {
 
   // -------------------------------------------------------------------------------- //
   getAvailableMessage_GSM(); // listening to sms receiver
 
   if (receivedMsg.length() > 0 && sender.equals(recipient)) { // after received a message
-    //Serial.println("cxcx");
+    //Serial.println("msg "+receivedMsg);
     if (receivedMsg.equals("0")) {
       char text[] = "0";
       for (int i = 0; i < 2; i++) {
         radio.write(&text, sizeof(text));
+        Serial.println("nrf 0");
         delay(100);
       }
     } else if (receivedMsg.equals("1")) {
       char text[] = "2";
       for (int i = 0; i < 2; i++) {
         radio.write(&text, sizeof(text));
+        Serial.println("nrf 2");
         delay(100);
       }
     }
@@ -95,14 +96,13 @@ void loop() {
   if (abs(prevX - curX) > 6000 || abs(prevY - curY) > 6000 || abs(prevZ - curZ) > 6000) {
     Serial.println("primary");
     String dataSet = String(curX) + "," + String(curY) + "," + String(curZ) + "," + String(soilRead);
-    //sendMessage(recipient, "data");
+    sendMessage(recipient, dataSet);
     Serial.println("emergency send : " + dataSet);
     char text[] = "1";
     for (int i = 0; i < 2; i++) {
       radio.write(&text, sizeof(text));
       delay(100);
     }
-    delay(200);
     startMillis = currentMillis;
 
   } else {
@@ -115,7 +115,7 @@ void loop() {
       startMillis = currentMillis;
     }
 
-    
+
 
   }
 
@@ -150,8 +150,8 @@ void setupMagneto() {
   needInitialize  = true; // to set prev variables
   Wire.begin();// Initialise I2C communication as MASTER
   Wire.beginTransmission(Addr);// Start I2C Transmission
-  Wire.write(0x10);// Select control register-1
-  Wire.write(0x01);// Set active mode enabled
+  Wire.write(0x02);// Select control register-1
+  Wire.write(0x00);// Set active mode enabled
   Wire.endTransmission();// Stop I2C Transmission
   readMagnato(); // set prev X,Y,Z values
 }
@@ -159,7 +159,7 @@ void setupMagneto() {
 void readMagnato() {
   unsigned int data[6];
   Wire.beginTransmission(Addr); // Start I2C Transmission
-  Wire.write(0x01); // Select data register
+  Wire.write(0x03); // Select data register
   Wire.endTransmission(); // Stop I2C Transmission
   Wire.requestFrom(Addr, 6); // Request 6 bytes of data
 
@@ -208,6 +208,7 @@ void getAvailableMessage_GSM() {
       generatedString.trim();
       sender = generatedString.substring(7, 19); // get the number who sends the message
       receivedMsg = generatedString.substring(48); // get the message
+      //Serial.println("xxx "+receivedMsg);
     } else {
       receivedMsg = "";
     }
@@ -221,16 +222,26 @@ void getAvailableMessage_GSM() {
 void sendMessage(String phoneNumber, String message) {
   //SIM900.print("AT+CMGF=1\r");
   //delay(100);
-  SIM900.println("AT + CMGS = \"" + phoneNumber + "\"");
-  delay(100);
+  SIM900.println("AT+CMGS=\"" + phoneNumber + "\"\r"); //Mobile phone number to send message
+  delay(50);
   SIM900.println(message);
-  delay(100);
-  SIM900.println((char)26);
-  delay(100);
-  SIM900.println();
-  delay(2000);
+  delay(50);
+  SIM900.println((char)26);// ASCII code of CTRL+Z
+  delay(50);
+  readSerial();
 }
 
+String readSerial() {
+  timeout = 0;
+  while  (!SIM900.available() && timeout < 10000  )
+  {
+    delay(13);
+    timeout++;
+  }
+  if (SIM900.available()) {
+    return SIM900.readString();
+  }
+}
 
 
 

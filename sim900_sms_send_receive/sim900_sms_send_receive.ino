@@ -26,13 +26,11 @@ void loop()
   getAvailableMessage_GSM(); // listening to sms receiver
   
   if(x==5){
-    sendMessage("776721484","asd5asd");x=2;
+    sendMessage("0776721484","asd5asd");x=2;
     }
 
 
 }
-
-
 
 
 
@@ -58,14 +56,14 @@ void getAvailableMessage_GSM() {
       generatedString.trim();
       Serial.println(generatedString.substring(48));
     }
-    delay(500);
+    //delay(500);
     generatedString = "";
   }
 }
 
 
 // sms sending method
-void sendMessage(String phoneNumber, String message) {
+void sendMessage(String phoneNumber, String message) {Serial.println("xxxxxx");
   //SIM900.print("AT+CMGF=1\r");
   //delay(100);
   SIM900.println("AT + CMGS = \"" + phoneNumber + "\"");
@@ -75,5 +73,5 @@ void sendMessage(String phoneNumber, String message) {
   SIM900.println((char)26);
   delay(100);
   SIM900.println();
-  delay(2000);
+  delay(500);Serial.println("yyyy");
 }

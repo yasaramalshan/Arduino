@@ -11,7 +11,7 @@
 void setup()
 {
   Wire.begin();        // join i2c bus (address optional for master)
-  Serial.begin(9600);  // start serial for output
+  Serial.begin(19200);  // start serial for output
   config();            // turn the MAG3110 on
 }
  

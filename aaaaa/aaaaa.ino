@@ -1,22 +1,46 @@
+#include <SoftwareSerial.h>
+SoftwareSerial sim(10, 11);
+int timeout;
+String number = "+94729143275";
+String message;
 
-unsigned long startMillis;  //some global variables available anywhere in the program
-//unsigned long currentMillis;
-const unsigned long period = 300;  //the value is a number of milliseconds
-const byte ledPin = 13;    //using the built in LED
-
-void setup()
+void setup() {
+  
+  Serial.begin(19200);
+  Serial.println("Sistem Started...");
+  sim.begin(19200);
+  message="zbc";
+  SendMessage();
+  delay(1000);
+  message="mjgty";
+  SendMessage();
+}
+void loop() {
+  
+}
+void SendMessage()
 {
-  Serial.begin(115200);  //start Serial in case we need to print debugging info
-  pinMode(ledPin, OUTPUT);
-  startMillis = millis();  //initial start time
+  //Serial.println ("Sending Message");
+  sim.println("AT+CMGF=1");    //Sets the GSM Module in Text Mode
+  delay(100);
+  //Serial.println ("Set SMS Number");
+  sim.println("AT+CMGS=\"" + number + "\"\r"); //Mobile phone number to send message
+  delay(100);
+  sim.println(message);
+  delay(100);
+  sim.println((char)26);// ASCII code of CTRL+Z
+  delay(100);
+  readSerial();
 }
 
-void loop()
-{
-  unsigned long currentMillis = millis();  //get the current "time" (actually the number of milliseconds since the program started)
-  if (currentMillis - startMillis >= 300)  //test whether the period has elapsed
+String readSerial() {
+  timeout = 0;
+  while  (!sim.available() && timeout < 12000  )
   {
-    digitalWrite(ledPin, !digitalRead(ledPin));  //if so, change the state of the LED.  Uses a neat trick to change the state
-    startMillis = currentMillis;  //IMPORTANT to save the start time of the current LED state.
+    delay(13);
+    timeout++;
+  }
+  if (sim.available()) {
+    return sim.readString();
   }
 }
