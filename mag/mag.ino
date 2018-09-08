@@ -15,7 +15,7 @@ void setup()
   // Initialise I2C communication as MASTER 
   Wire.begin();
   // Initialise serial communication, set baud rate = 9600
-  Serial.begin(9600);
+  Serial.begin(19200);
   
   // Start I2C Transmission
   Wire.beginTransmission(Addr);
@@ -62,9 +62,9 @@ void loop()
   // Output data to serial monitor
   Serial.print("X Axis : ");
   Serial.print(xMag);
-  Serial.print("Y Axis : ");
+  Serial.print(" Y Axis : ");
   Serial.print(yMag);
-  Serial.print("Z Axis : ");
+  Serial.print(" Z Axis : ");
   Serial.println(zMag);
   delay(50);
 }
